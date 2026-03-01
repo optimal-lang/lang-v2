@@ -54,6 +54,14 @@ function compile_ast(ast) {
   if (common.is_script(ast)) {
     return ast[1];
   }
+  if (common.is_template(ast)) {
+    let template = ast[1];
+    template = template.replace(/(`)/g, "\\`");
+    template = template.replace(/({{)/g, "${");
+    template = template.replace(/(}})/g, "}");
+    template = "`" + template + "`";
+    return template;
+  }
   if (common.is_id(ast[0]) && common.to_id(ast[0])==="?") {
     return compile_ast([common.id("list"), ...ast]);
   }
@@ -61,7 +69,7 @@ function compile_ast(ast) {
     return compile_ast([common.id("list"), ...ast]);
   }
   switch (common.to_id(ast[0])) {
-  case "@": {
+  case "<script>": {
     let fcall = ast[0][1] + "(";
     for (let i = 1; i < ast.length; i++) {
       if (i > 1)

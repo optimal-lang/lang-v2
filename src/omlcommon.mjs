@@ -39,6 +39,12 @@ export class OMLCommon {
     return ast[0] === "@";
   }
 
+  is_template(ast) {
+    if (!(ast instanceof Array)) false;
+    if (ast.length === 0) return false;
+    return ast[0] === "#@";
+  }
+
   is_callable(ast) {
     if (!(ast instanceof Array)) false;
     if (ast.length === 0) return false;
@@ -58,7 +64,7 @@ export class OMLCommon {
       let ids = ast.slice(1);
       return ids.join(".");
     } else if (this.is_script(ast)) {
-      return "@";
+      return "<script>";
     }
     return ast;
   }
