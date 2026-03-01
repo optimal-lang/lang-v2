@@ -4,7 +4,8 @@ eval(text);
 //import { run } from "./src/omljs.mjs";
 
 run(`
-(console.log #@\`answer\`={{11+22}}@)
+(console.log #@\`answerA\`={{11+22}}@)
+(console.log ("#@" "\`answerB\`={{110+220}}"))
 (console.log #@
 answer1={{110+220}}
 answer2={{330+440}}
