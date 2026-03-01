@@ -439,7 +439,7 @@ export function omljs() {
       let exp = step[0];
       let ast = step[1];
       if (debug)
-        console.log(" [OML] " + exp);
+        console.log("[LISP] " + exp);
       if (debug)
         console.log(" [AST] " + JSON.stringify(ast));
       let code = compile_ast(ast);
@@ -461,7 +461,7 @@ export function omljs() {
       var tm1 = new Date().getTime();
       try {
         if (debug)
-          console.log(" [OML] " + exp);
+          console.log("[LISP] " + exp);
         if (debug)
           console.log(" [AST] " + JSON.stringify(ast));
         text = compile_ast(ast);
@@ -501,7 +501,7 @@ export function omljs() {
       }
       catch (e) {
         if (!debug)
-          console.log(" [OML] " + exp);
+          console.log("[LISP] " + exp);
         if (!debug)
           console.log(" [AST] " + JSON.stringify(ast));
         if (!debug)

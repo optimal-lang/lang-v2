@@ -1,9 +1,13 @@
 #! /usr/bin/env deno-run
-const text = await Deno.readTextFile("./dist/omljs.js");
-eval(text);
-//import { run } from "./src/omljs.mjs";
+//const text = await Deno.readTextFile("./dist/omljs.js");
+//eval(text);
+import { run } from "./src/omljs.mjs";
 
 run(`
+#lang lisp
+# 行コメント(1)
+##行コメント(2)
+;行コメント(3)
 (console.log #@\`answerA\`={{11+22}}@)
 (console.log ("#@" "\`answerB\`={{110+220}}"))
 (console.log #@
@@ -37,7 +41,7 @@ def")
   (set! x (+ 2 x))
   (console.log x]
 
-##(Deno.exit 0)
+;(Deno.exit 0)
 [dotimes (i 3) (console.log i]
 [dotimes (i 3) (dotimes (j 2) (console.log (list i j]
 (define x 11)
