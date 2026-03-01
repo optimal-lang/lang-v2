@@ -1,9 +1,14 @@
 #! /usr/bin/env deno-run
-const text = await Deno.readTextFile("./dist/omljs.js");
-eval(text);
-//import { run } from "./src/omljs.mjs";
+//const text = await Deno.readTextFile("./dist/omljs.js");
+//eval(text);
+import { run } from "./src/omljs.mjs";
 
 run(`
+(console.log #@\`answer\`={{11+22}}@)
+(console.log #@
+answer1={{110+220}}
+answer2={{330+440}}
+@)
 (console.log "abc
 def")
 (console.log {
