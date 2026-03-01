@@ -1,11 +1,14 @@
 function tokenize(str) {
-  let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|;.*|#!.*|##.*|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
+  //let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|;.*|#!.*|##.*|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
+  let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|;.*|#!.*|##.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
   let result = [];
   let token;
   while ((token = re.exec(str)[1]) !== "") {
+    console.log(`token=${token}`);
     if (token[0] === ";") continue;
     if (token.startsWith("#!")) continue;
     if (token.startsWith("##")) continue;
+    if (token.startsWith("#|")) continue;
     if (token.startsWith("#")) token = token.substring(1);
     if (isFinite(token)) token = parseFloat(token, 10);
     result.push(token);
