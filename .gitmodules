@@ -1,0 +1,3 @@
+[submodule "oml2ast"]
+	path = oml2ast
+	url = https://github.com/optimal-lang/oml2ast

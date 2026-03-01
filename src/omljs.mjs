@@ -1,4 +1,4 @@
-import { oml2ast, ast2oml, astequal } from "./oml2ast.mjs";
+import { oml2ast, ast2oml, astequal } from "../oml2ast/oml2ast.mjs";
 import { OMLCommon } from "./omlcommon.mjs";
 
 let common = new OMLCommon();
