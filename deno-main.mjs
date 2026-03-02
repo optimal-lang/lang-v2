@@ -8,6 +8,9 @@ run(`
 # 行コメント(1)
 ##行コメント(2)
 ;行コメント(3)
+#|
+xyz();
+|#
 (console.log #@\`answerA\`={{11+22}}@)
 (console.log ("#@" "\`answerB\`={{110+220}}"))
 (console.log #@
@@ -20,9 +23,9 @@ def")
   "abc" "xyz"
   "bbb" (11 undefined "ハロー©")
 })
-(console.log #| 111+222 |#)
+(console.log #|@ 111+222 |#)
 (console.log ("@" "777+888"))
-(console.log #| 1111+2222 |#)
+(console.log #|@ 1111+2222 |#)
 (console.log @
 1111
 +
