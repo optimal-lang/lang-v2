@@ -1,5 +1,5 @@
 function tokenize(str) {
-    let re = /[\s,]*([()\[\]{}'`]|[$]?"(?:\\.|[^\\"])*"|@(?:@@|[^@])*@|#@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
+    let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|[$]?@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
     let result = [];
     let token;
     while ((token = re.exec(str)[1]) !== "") {
@@ -9,7 +9,7 @@ function tokenize(str) {
         if (token.startsWith("##")) continue;
         if (token.startsWith("# ")) continue;
         if (token.startsWith("#lang ")) continue;
-        if (token.startsWith("#|") && !token.startsWith("#!@")) continue;
+        if (token.startsWith("#|") && !token.startsWith("#|@")) continue;
         if (!token.startsWith("#@") && !token.startsWith("#|") && token.startsWith("#")) token = token.substring(1);
         if (isFinite(token)) token = parseFloat(token, 10);
         result.push(token);
@@ -69,8 +69,8 @@ function read_sexp(code, exp) {
   }
   let ch = token[0];
     if (ch == "#") ch = token.slice(0, 2);
-    if (token.startsWith('$"')) {
-        ch = '$"';
+    if (token.startsWith('$@')) {
+        ch = '$@';
     }
   switch (ch) {
   case "(":
@@ -89,10 +89,6 @@ function read_sexp(code, exp) {
     token = token.replaceAll("\n", "\\n");
     token = JSON.parse(token);
     return token;
-  case '$"':
-    token = token.replaceAll("\r\n", "\n");
-      token = token.replace(/(^[$]"|"$)/g, "");
-      return ["#@", token];
   case "@":
     token = token.replace(/(^@|@$)/g, "");
     token = token.replace(/(@@)/g, "@");
@@ -105,11 +101,11 @@ function read_sexp(code, exp) {
       token = token.trim();
       return ["@", token];
     }
-  case "#@": // template literal string
-    token = token.replaceAll("\r\n", "\n");
-    token = token.replace(/(^#@|@$)/g, "");
-    token = token.replace(/(@@)/g, "@");
-    return ["#@", token];
+  case "$@": // template literal string
+      token = token.replaceAll("\r\n", "\n");
+      token = token.replace(/(^[$]@|@$)/g, "");
+      token = token.replace(/(@@)/g, "@");
+      return ["$@", token];
   default: {
     if (token[0] === ":") return token;
     if (token[0] === "&") return token;

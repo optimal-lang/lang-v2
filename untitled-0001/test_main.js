@@ -1,18 +1,9 @@
-//const text = await Deno.readTextFile("./dist/omljs.js");
-//(0,eval)(text);
-import { run } from "./src/omljs.mjs";
-
-run(`
+function test_main() {
+omljs.run(`
 #lang lisp
 # 行コメント(1)
 ##行コメント(2)
 ;行コメント(3)
-#|
-xyz();
-|#
-#|@
-console.log("XXX");
-|#
 (console.log $@answerA={{11+22}}@)
 (console.log ("$@" "answerB={{110+220}}"))
 (console.log $@
@@ -73,4 +64,5 @@ def")
 (console.log (&& (< 2 4) (> 3 4]
   (try (throw 123)
   (catch ex (console.log ex]
-`); // run()
+`);
+}

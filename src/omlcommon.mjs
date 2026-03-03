@@ -42,7 +42,7 @@ export class OMLCommon {
   is_template(ast) {
     if (!(ast instanceof Array)) false;
     if (ast.length === 0) return false;
-    return ast[0] === "#@";
+    return ast[0] === "$@";
   }
 
   is_callable(ast) {

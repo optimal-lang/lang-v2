@@ -1,9 +1,10 @@
 #! /usr/bin/env bash
-set -uvx
+#set -uvx
 set -e
 cd "$(dirname "$0")"
 cwd=`pwd`
 ts=`date "+%Y.%m%d.%H%M.%S"`
 
-npm install webpack --save-dev
-npm install webpack-cli --save-dev
+if ! command -v esbuild &> /dev/null; then
+    npm install -g esbuild
+fi
