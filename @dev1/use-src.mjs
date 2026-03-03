@@ -1,4 +1,3 @@
-#! /usr/bin/env deno-run
 import { mylib } from "./src/mylib.mjs";
 
 globalThis.my_print = function(x) {
