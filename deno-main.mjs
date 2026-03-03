@@ -11,6 +11,9 @@ run(`
 #|
 xyz();
 |#
+#|@
+console.log("XXX");
+|#
 ;;(console.log #@\`answerA\`={{11+22}}@)
 (console.log $"\`answerA\`={{11+22}}")
 (console.log ("#@" "\`answerB\`={{110+220}}"))

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>index.html</title>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/1.6.1/pixi.js"></script>
+</head>
+<body>
+  <script src="./dist/mylib.js"></script>
+  <script>
+    globalThis.my_print = function(x) {
+        console.log(`x is: ${JSON.stringify(x, null, 2)}`);
+    };
+    console.log("あああ");
+    var g = mylib.mylib({});
+    console.log(123);
+    g.demo();
+    var answer = g.add2(11, 22);
+    console.log(answer);
+    alert(`ansser=${answer}`);
+  </script>
+
+  <!--
+  <script type="module">
+    import { mylib } from "./src/mylib.mjs";
+    var g = mylib({});
+    console.log(123);
+    g.demo();
+    var answer = g.add2(11, 22);
+    console.log(answer);
+    alert(`ansser=${answer}`);
+  </script>
+  -->
+
+</body>
+</html>
