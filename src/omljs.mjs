@@ -542,13 +542,13 @@ export function run(exp) {
   const o = omljs();
   return o.run(exp);
 }
-globalThis.run = run;
+//globalThis.run = run;
 
 export function runAll(exp) {
   const o = omljs();
   return o.runAll(exp);
 }
-globalThis.runAll = runAll;
+//globalThis.runAll = runAll;
 
 function print(x) {
   console.log(ast2oml(x));
