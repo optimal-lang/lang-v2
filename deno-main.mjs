@@ -1,7 +1,7 @@
 //const text = await Deno.readTextFile("./dist/omljs.js");
 //(0,eval)(text);
-//import { run, omljs } from "./src/omljs.mjs";
-import { omljs } from "./dist/omljs.mjs";
+import { run, omljs } from "./src/omljs.mjs";
+//import { omljs } from "./dist/omljs.mjs";
 
 const glob = omljs(globalThis);
 glob.run(`

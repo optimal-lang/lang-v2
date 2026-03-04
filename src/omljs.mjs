@@ -4,7 +4,8 @@ import { OMLCommon } from "./omlcommon.mjs";
 const common = new OMLCommon();
 
 function compile_number(ast) {
-  return `number_value(${compile_ast(ast)})`;
+  //return `number_value(${compile_ast(ast)})`;
+  return compile_ast(ast);
 }
 
 function compile_string(ast) {
@@ -555,10 +556,10 @@ function print(x) {
 };
 globalThis.print = print;
 
-function number_value(x) {
-  return typeof x !== "number" ? 0 : x;
-}
-globalThis.number_value = number_value;
+// function number_value(x) {
+//   return typeof x !== "number" ? 0 : x;
+// }
+// globalThis.number_value = number_value;
 
 function equal(a, b) {
   return astequal(a, b);
