@@ -8,5 +8,6 @@ if [ ! -f "package-lock.json" ]; then
     ./init.sh
 fi
 rm -rvf dist
-esbuild src/mylib.mjs --bundle --format=iife --global-name=mylib --outfile=dist/mylib.js
+esbuild src/mylib.mjs --bundle --format=iife   --outfile=dist/mylib.js --global-name=mylib
+esbuild src/mylib.mjs --bundle --format=esm --outfile=dist/mylib.mjs
 ls -ltrh ./dist
