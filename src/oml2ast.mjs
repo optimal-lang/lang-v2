@@ -1,6 +1,6 @@
 function tokenize(str) {
-    let re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|[$]?@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
-    let result = [];
+    const re = /[\s,]*([()\[\]{}'`]|"(?:\\.|[^\\"])*"|[$]?@(?:@@|[^@])*@|;.*|#[!# ].*|#lang[ ]+.*|#[\|][\s\S]+?[\|]#|#[a-z]+|[^\s,()\[\]{}'"`;@]*)/g;
+    const result = [];
     let token;
     while ((token = re.exec(str)[1]) !== "") {
         //console.log(`token=${token}`);
@@ -19,13 +19,13 @@ function tokenize(str) {
 
 function read_token(code, exp) {
   if (code.length === 0) return undefined;
-  let token = code.shift();
+  const token = code.shift();
   exp.push(token);
   return token;
 }
 
 function read_list(code, exp, ch) {
-  let result = [];
+  const result = [];
   let ast;
   while ((ast = read_sexp(code, exp, false)) !== undefined) {
     if (ast === "]") {
@@ -40,7 +40,7 @@ function read_list(code, exp, ch) {
 }
 
 function read_dict(code, exp) {
-  let result = [["#", "dict"]];
+  const result = [["#", "dict"]];
   let ast1;
   let ast2;
   while ((ast1 = read_sexp(code, exp)) !== undefined) {
@@ -75,8 +75,10 @@ function read_sexp(code, exp) {
   switch (ch) {
   case "(":
   case "[":
-    let lst = read_list(code, exp, ch);
-    return lst;
+    {
+      const lst = read_list(code, exp, ch);
+      return lst;
+    }
   case ")":
   case "]":
     return ch;
@@ -94,13 +96,19 @@ function read_sexp(code, exp) {
     token = token.replace(/(@@)/g, "@");
     token = token.trim();
     return ["@", token];
-  case "#|":
+  case "#|": {
     if (token.startsWith("#|@")) {
       token = token.replace(/^#[\|]@/g, "");
       token = token.replace(/[\|]#$/g, "");
       token = token.trim();
       return ["@", token];
     }
+    // not a "#|@" quoted string – handle as in the default branch
+    if (token[0] === ":") return token;
+    if (token[0] === "&") return token;
+    const ids = token[0] === "." ? [token] : token.split(".");
+    return ["#", ...ids];
+  }
   case "$@": // template literal string
       token = token.replaceAll("\r\n", "\n");
       token = token.replace(/(^[$]@|@$)/g, "");
@@ -109,7 +117,7 @@ function read_sexp(code, exp) {
   default: {
     if (token[0] === ":") return token;
     if (token[0] === "&") return token;
-    let ids = token[0] === "." ? [token] : token.split(".");
+    const ids = token[0] === "." ? [token] : token.split(".");
     return ["#", ...ids];
   }
   }
@@ -137,11 +145,11 @@ function join_sexp(exp) {
 }
 
 export function oml2ast(text) {
-  let code = tokenize(text);
-  let result = [];
+  const code = tokenize(text);
+  const result = [];
   while (true) {
-    let exp = [];
-    let ast = read_sexp(code, exp);
+    const exp = [];
+    const ast = read_sexp(code, exp);
     if (ast === undefined) break;
     if (ast === ")") continue;
     if (ast === "]") continue;
@@ -163,14 +171,14 @@ export function ast2oml(ast) {
       result += ast2oml(ast[i]);
     }
     let keys = Object.keys(ast);
-    let re = /^[0-9]+/;
+    const re = /^[0-9]+/;
     keys = keys.filter(key => !re.test(key));
     keys.sort();
     if (keys.length > 0) {
       if (ast.length > 0) result += " ";
       result += "?";
       for (let i=0; i<keys.length; i++) {
-        let key = keys[i];
+        const key = keys[i];
         result += " (";
         result += JSON.stringify(key);
         result += " ";
@@ -182,7 +190,7 @@ export function ast2oml(ast) {
     return result;
   } else {
     let result = "{ ";
-    let keys = Object.keys(ast);
+    const keys = Object.keys(ast);
     keys.sort();
     for (let i = 0; i < keys.length; i++) {
       if (i > 0) result += " ";

@@ -1,0 +1,4 @@
+{ // VSCodeの拡張機能マーケットプレイスから Deno (denoland.vscode-deno) をインストール
+  "deno.enable": true,
+  "deno.lint": true
+}

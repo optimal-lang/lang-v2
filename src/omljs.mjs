@@ -1,7 +1,7 @@
 import { oml2ast, ast2oml, astequal } from "./oml2ast.mjs";
 import { OMLCommon } from "./omlcommon.mjs";
 
-let common = new OMLCommon();
+const common = new OMLCommon();
 
 function compile_number(ast) {
   return `number_value(${compile_ast(ast)})`;
@@ -17,9 +17,9 @@ function compile_body_helper(body) {
   for (let i = 0; i < body.length; i++) {
     if (i > 0)
       result += ",";
-    let def = common.to_def(body[i]);
+    const def = common.to_def(body[i]);
     if (def !== null) {
-      let let_ast = [common.id("let"), [[def[1], def[2]]], ...body.slice(i + 1)];
+      const let_ast = [common.id("let"), [[def[1], def[2]]], ...body.slice(i + 1)];
       return result + compile_ast(let_ast) + ")";
     }
     result += compile_ast(body[i]);
@@ -28,11 +28,26 @@ function compile_body_helper(body) {
 }
 
 function compile_body(ast, start) {
-  let body = [];
+  const body = [];
   for (let i = start; i < ast.length; i++) {
     body.push(ast[i]);
   }
   return compile_body_helper(body);
+}
+
+function _cond_builder_helper(rest) {
+  if (rest.length === 0)
+    return null;
+  let condition = rest.shift();
+  condition = common.to_id(condition);
+  const action = rest.shift();
+  switch (condition) {
+  case true:
+  case "else":
+  case "otherwise":
+    return action;
+  }
+  return [common.id("if"), condition, action, _cond_builder_helper(rest)];
 }
 
 function compile_ast(ast) {
@@ -82,38 +97,23 @@ function compile_ast(ast) {
   case "begin":
     return compile_body(ast, 1);
   case "case": {
-    let cond_ast = [common.id("cond")];
+    const cond_ast = [common.id("cond")];
     for (let i=2; i<ast.length; i++) {
-      let e = ast[i];
+      const e = ast[i];
       if (common.is_id(e[0], "else") || common.is_id(e[0], "otherwise")) {
         cond_ast.push(e);
       } else {
         cond_ast.push([[common.id("equal"), common.id("__case__"), e[0]],...e.slice(1)]);
       }
     }
-    let new_ast = [common.id("let*"), [[common.id("__case__"), ast[1]]], cond_ast];
+    const new_ast = [common.id("let*"), [[common.id("__case__"), ast[1]]], cond_ast];
     return compile_ast(new_ast);
   }
   case "_cond": {
-    function _cond_builder(rest) {
-      if (rest.length === 0)
-        return null;
-      let condition = rest.shift();
-      condition = common.to_id(condition);
-      let action = rest.shift();
-      switch (condition) {
-      case true:
-      case "else":
-      case "otherwise":
-        return action;
-      }
-      return [common.id("if"), condition, action, _cond_builder(rest)];
-    }
-    ast = _cond_builder(ast.slice(1));
-    return compile_ast(ast);
+    return compile_ast(_cond_builder_helper(ast.slice(1)));
   }
   case "cond": {
-    let new_ast = [];
+    const new_ast = [];
     ast.slice(1).forEach((x) => {
       new_ast.push(x[0]);
       new_ast.push([["#", "begin"]].concat(x.slice(1)));
@@ -122,10 +122,11 @@ function compile_ast(ast) {
     return compile_ast(new_ast);
   }
   case "dec!":
-  case "inc!":
-    let sign = common.to_id(ast[0]) === "dec!" ? "-" : "+";
-    let val = ast.length < 3 ? 1 : compile_ast(ast[2]);
+  case "inc!": {
+    const sign = common.to_id(ast[0]) === "dec!" ? "-" : "+";
+    const val = ast.length < 3 ? 1 : compile_ast(ast[2]);
     return compile_ast(ast[1]) + sign + "=" + val;
+  }
   case "def": {
     ast = common.to_def(ast);
     return "globalThis." + common.to_id(ast[1]) + "=" + compile_ast(ast[2]);
@@ -156,13 +157,13 @@ function compile_ast(ast) {
       ast1 = [common.id("$index"), ast1];
     else if (ast1.length < 2)
       throw new Error("syntax error");
-    let result_exp = ast1.length < 3 ? common.id("null") : ast1[2];
-    let bind = [
+    const result_exp = ast1.length < 3 ? common.id("null") : ast1[2];
+    const bind = [
       [common.id("__dotimes_cnt__"), ast1[1]],
       [common.id("__dotimes_idx__"), 0, [common.id("+"), common.id("__dotimes_idx__"), 1]],
       [ast1[0], common.id("__dotimes_idx__"), common.id("__dotimes_idx__")],
     ];
-    let exit = [[common.id(">="), common.id("__dotimes_idx__"), common.id("__dotimes_cnt__")], result_exp];
+    const exit = [[common.id(">="), common.id("__dotimes_idx__"), common.id("__dotimes_cnt__")], result_exp];
     ast = [common.id("do*"), bind, exit].concat(ast.slice(2));
     return compile_ast(ast);
   }
@@ -184,14 +185,14 @@ function compile_ast(ast) {
       ast1 = [common.id("$item"), ast1];
     else if (ast1.length < 2)
       throw new Error("syntax error");
-    let result_exp = ast1.length < 3 ? common.id("null") : ast1[2];
-    let bind = [
+    const result_exp = ast1.length < 3 ? common.id("null") : ast1[2];
+    const bind = [
       [common.id("__dolist_list__"), ast1[1]],
       [common.id("__dolist_cnt__"), [common.id("length"), common.id("__dolist_list__")]],
       [common.id("__dolist_idx__"), 0, [common.id("+"), common.id("__dolist_idx__"), 1]],
       [ast1[0], [common.id("prop-get"), common.id("__dolist_list__"), common.id("__dolist_idx__")], [common.id("prop-get"), common.id("__dolist_list__"), common.id("__dolist_idx__")]],
     ];
-    let exit = [[common.id(">="), common.id("__dolist_idx__"), common.id("__dolist_cnt__")], result_exp];
+    const exit = [[common.id(">="), common.id("__dolist_idx__"), common.id("__dolist_cnt__")], result_exp];
     ast = [common.id("do*"), bind, exit].concat(ast.slice(2));
     return compile_ast(ast);
   }
@@ -205,9 +206,9 @@ function compile_ast(ast) {
             ")");
   case "let":
   case "let*": {
-    let ast1 = ast[1];
-    let new_ast1 = [];
-    for (let x of ast1) {
+    const ast1 = ast[1];
+    const new_ast1 = [];
+    for (const x of ast1) {
       if (typeof x === "string") {
         new_ast1.push(x);
         new_ast1.push(undefined);
@@ -228,7 +229,7 @@ function compile_ast(ast) {
       if (i > 1)
         vars += ",";
       vars += common.to_id(ast[1][i - 1]);
-      let val = compile_ast(ast[1][i]);
+      const val = compile_ast(ast[1][i]);
       if (i > 1)
         vals += ",";
       vals += val;
@@ -257,7 +258,7 @@ function compile_ast(ast) {
     ast = ast.slice(1);
     let found = -1;
     for (let i = 0; i < ast.length; i++) {
-      let e = ast[i];
+      const e = ast[i];
       if (common.is_id(e) && common.to_id(e) === "?") {
         found = i;
         break;
@@ -275,7 +276,7 @@ function compile_ast(ast) {
       list = ast.slice(0, found);
       dict = ast.slice(found + 1);
     }
-    let body = [];
+    const body = [];
     for (let i = 0; i < list.length; i++) {
       body.push([common.id("prop-set!"), common.id("__obj__"), i, list[i]]);
     }
@@ -290,7 +291,7 @@ function compile_ast(ast) {
   }
   case "dict": {
     if ((ast.length % 2) !== 1) throw new Error("synatx error");
-    let body = [];
+    const body = [];
     for (let i = 1; i < ast.length; i += 2) {
       body.push([common.id("prop-set!"), common.id("__dict__"), ast[i], ast[i + 1]]);
     }
@@ -322,9 +323,9 @@ function compile_ast(ast) {
             "}})(),null)");
   }
   case ".": {
-    let op = "+";
-    let rest = ast.slice(1);
-    let result = [];
+    const op = "+";
+    const rest = ast.slice(1);
+    const result = [];
     for (let i = 0; i < rest.length; i++) {
       if (i > 0) result.push(op);
       result.push(compile_string(rest[i]));
@@ -370,7 +371,7 @@ function compile_ast(ast) {
 function insert_op(op, rest) {
   if (rest.length === 1)
     return op + compile_number(rest[0]);
-  let result = [];
+  const result = [];
   for (let i = 0; i < rest.length; i++) {
     if (i > 0) result.push(op);
     result.push(compile_number(rest[i]));
@@ -379,10 +380,10 @@ function insert_op(op, rest) {
 }
 
 function compile_do(ast) {
-  let ast1 = ast[1];
-  let parallel = ast[0] === "do";
-  let ast1_len = ast1.length;
-  let ast1_vars = [];
+  const ast1 = ast[1];
+  const parallel = ast[0] === "do";
+  const ast1_len = ast1.length;
+  const ast1_vars = [];
   if (parallel) {
     ast1_vars.push("__do__");
     ast1_vars.push("new Array(" + ast1_len + ").fill(null)");
@@ -394,18 +395,18 @@ function compile_do(ast) {
   let ast2 = ast[2];
   if (ast2.length < 2)
     ast2 = [ast2[0], null];
-  let until_ast = [common.id("until"), ast2[0]].concat(ast.slice(3));
+  const until_ast = [common.id("until"), ast2[0]].concat(ast.slice(3));
   if (parallel) {
     ast1.forEach((x, i) => {
       if (x.length < 3)
         return;
-      let next_step = [id("set!"), "__do__[" + i + "]", x[2]];
+      const next_step = [common.id("set!"), "__do__[" + i + "]", x[2]];
       until_ast.push(next_step);
     });
     ast1.forEach((x, i) => {
       if (x.length < 3)
         return;
-      let next_step = [id("set!"), x[0], "__do__[" + i + "]"];
+      const next_step = [common.id("set!"), x[0], "__do__[" + i + "]"];
       until_ast.push(next_step);
     });
   }
@@ -413,36 +414,36 @@ function compile_do(ast) {
     ast1.forEach((x) => {
       if (x.length < 3)
         return;
-      let next_step = [common.id("set!"), x[0], x[2]];
+      const next_step = [common.id("set!"), x[0], x[2]];
       until_ast.push(next_step);
     });
   }
-  let new_ast = [parallel ? common.id("_let") : common.id("_let*"), ast1_vars].concat([until_ast]);
+  const new_ast = [parallel ? common.id("_let") : common.id("_let*"), ast1_vars].concat([until_ast]);
   new_ast.push(ast2[1]);
   return compile_ast(new_ast);
 }
 
 export function omljs() {
-  let glob = {};
+  const glob = {};
   glob.compile_ast = (ast, debug) => {
     if (debug)
       console.log(" [AST] " + JSON.stringify(ast));
-    let code = compile_ast(ast);
+    const code = compile_ast(ast);
     if (debug)
       console.log("[CODE] " + code);
     return code;
   };
   glob.compile = (text, debug) => {
-    let steps = oml2ast(text);
+    const steps = oml2ast(text);
     let result = "";
-    for (let step of steps) {
-      let exp = step[0];
-      let ast = step[1];
+    for (const step of steps) {
+      const exp = step[0];
+      const ast = step[1];
       if (debug)
         console.log("[LISP] " + exp);
       if (debug)
         console.log(" [AST] " + JSON.stringify(ast));
-      let code = compile_ast(ast);
+      const code = compile_ast(ast);
       if (debug)
         console.log("[CODE] " + code);
       result += code + ";\n";
@@ -451,14 +452,14 @@ export function omljs() {
   };
   glob.exec_d = (exp) => glob.exec(exp, true);
   glob.exec = (exp, debug) => {
-    let src = exp;
-    let steps = oml2ast(src);
+    const src = exp;
+    const steps = oml2ast(src);
     let last;
     let text = "";
-    for (let step of steps) {
-      let exp = step[0];
-      let ast = step[1];
-      var tm1 = new Date().getTime();
+    const tm1 = new Date().getTime();
+    for (const step of steps) {
+      const exp = step[0];
+      const ast = step[1];
       try {
         if (debug)
           console.log("[LISP] " + exp);
@@ -467,7 +468,7 @@ export function omljs() {
         text = compile_ast(ast);
         if (debug)
           console.log("[CODE] " + text);
-        let val = eval(text);
+        const val = eval(text);
         last = val;
         let output;
         if (typeof val === "function") {
@@ -480,15 +481,15 @@ export function omljs() {
             output =
               Object.prototype.toString.call(val) + " " + JSON.stringify(val);
           }
-          catch (e) { }
+          catch (_e) { ; }
         }
         else {
           try {
             output = JSON.stringify(val);
           }
-          catch (e) { }
+          catch (_e) { ; }
         }
-        var tm2 = new Date().getTime();
+        const tm2 = new Date().getTime();
         if (debug) {
           if (output === undefined) {
             console.log("==> (" + (tm2 - tm1) + " ms)");
@@ -512,14 +513,13 @@ export function omljs() {
         else
           console.log(e);
         throw e;
-        break;
       }
     }
     return last;
   };
   glob.run = (exp) => glob.exec(exp, true);
   glob.execAll = (exp, debug) => {
-    let text = glob.compile(exp, debug);
+    const text = glob.compile(exp, debug);
     try {
       return eval(text);
     } catch (e) {
@@ -538,13 +538,13 @@ export function omljs() {
 globalThis.omljs = omljs;
 
 export function run(exp) {
-  let o = omljs();
+  const o = omljs();
   return o.run(exp);
 }
 globalThis.run = run;
 
 export function runAll(exp) {
-  let o = omljs();
+  const o = omljs();
   return o.runAll(exp);
 }
 globalThis.runAll = runAll;

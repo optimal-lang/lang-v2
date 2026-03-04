@@ -1,8 +1,10 @@
 //const text = await Deno.readTextFile("./dist/omljs.js");
 //(0,eval)(text);
-import { run } from "./src/omljs.mjs";
+//import { run, omljs } from "./src/omljs.mjs";
+import { omljs } from "./dist/omljs.mjs";
 
-run(`
+const glob = omljs(globalThis);
+glob.run(`
 #lang lisp
 # 行コメント(1)
 ##行コメント(2)

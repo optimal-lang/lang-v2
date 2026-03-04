@@ -22,31 +22,32 @@ export class OMLCommon {
   }
 
   is_id(ast, name = undefined) {
-    let ok = ast instanceof Array && ast[0] === "#";
+    const ok = ast instanceof Array && ast[0] === "#";
     if (!ok) return false;
-    return name ? ast[1]===name : true;
+    if (name !== undefined) return ast.length > 1 && ast[1] === name;
+    return true;
   }
 
   is_variable(ast) {
-    if (!(ast instanceof Array)) false;
+    if (!(ast instanceof Array)) return false;
     if (ast.length === 0) return false;
     return ast[0] === "#";
   }
 
   is_script(ast) {
-    if (!(ast instanceof Array)) false;
+    if (!(ast instanceof Array)) return false;
     if (ast.length === 0) return false;
     return ast[0] === "@";
   }
 
   is_template(ast) {
-    if (!(ast instanceof Array)) false;
+    if (!(ast instanceof Array)) return false;
     if (ast.length === 0) return false;
     return ast[0] === "$@";
   }
 
   is_callable(ast) {
-    if (!(ast instanceof Array)) false;
+    if (!(ast instanceof Array)) return false;
     if (ast.length === 0) return false;
     if (ast[0] === "#") return false;
     if (ast[0] === "@") return false;
@@ -54,14 +55,14 @@ export class OMLCommon {
   }
 
   is_fn(ast) {
-    if (!(ast instanceof Array)) false;
+    if (!(ast instanceof Array)) return false;
     if (ast.length === 0) return false;
     return this.is_id(ast[0]) && this.to_id(ast[0])==="fn";
   }
 
   to_id(ast) {
     if (this.is_id(ast)) {
-      let ids = ast.slice(1);
+      const ids = ast.slice(1);
       return ids.join(".");
     } else if (this.is_script(ast)) {
       return "<script>";
@@ -78,35 +79,35 @@ export class OMLCommon {
     if (ast.length === 0) return null;
     switch (this.to_id(ast[0])) {
     case "def": {
-      if (ast.length < 2) throw new Error("sysntax error");
-      let ast1 = ast[1];
-      let ast2 = ast.length === 2 ? null : ast[2];
+      if (ast.length < 2) throw new Error("syntax error");
+      const ast1 = ast[1];
+      const ast2 = ast.length === 2 ? null : ast[2];
       return [this.id("def"), ast1, ast2];
     }
     case "defvar": {
-      if (ast.length < 2) throw new Error("sysntax error");
-      let ast1 = ast[1];
-      let ast2 = ast.length === 2 ? null : ast[2];
+      if (ast.length < 2) throw new Error("syntax error");
+      const ast1 = ast[1];
+      const ast2 = ast.length === 2 ? null : ast[2];
       return [this.id("def"), ast1, ast2];
     }
     case "defun": {
-      let new_ast = ast.slice(3);
+      if (ast.length < 3) throw new Error("syntax error");
+      const new_ast = ast.slice(3);
       new_ast.unshift(ast[2]);
       new_ast.unshift(this.id("fn"));
       return [this.id("def"), ast[1], new_ast];
     }
     case "define": {
-      let ast1 = this.to_id(ast[1]);
+      const ast1 = this.to_id(ast[1]);
       if (ast1 instanceof Array) {
-        if (ast.length < 2) throw new Error("sysntax error");
-        let new_ast = ast.slice(2);
+        if (ast.length < 2) throw new Error("syntax error");
+        const new_ast = ast.slice(2);
         return this.to_def([this.id("defun"), ast[1][0], ast[1].slice(1), ...new_ast]);
       }
       else {
-        if (ast.length < 2) throw new Error("sysntax error");
-        let ast1 = ast[1];
-        let ast2 = ast.length === 2 ? null : ast[2];
-        return this.to_def([this.id("defvar"), ast1, ast2]);
+        if (ast.length < 2) throw new Error("syntax error");
+        const ast2 = ast.length === 2 ? null : ast[2];
+        return this.to_def([this.id("defvar"), ast[1], ast2]);
       }
     }
     default:
