@@ -2,13 +2,13 @@ globalThis.my_print = function(x) {
     console.log(`x is: ${JSON.stringify(x, null, 2)}`);
 };
 
-var code = await Deno.readTextFile("dist/mylib.js");
+const code = await Deno.readTextFile("dist/mylib.js");
 //console.log(code);
 (0, eval)(code);
 
-var g = mylib.mylib({});
+const g = mylib.mylib({});
 
 console.log(123);
 g.demo();
-var answer = g.add2(11, 22);
+const answer = g.add2(11, 22);
 console.log(answer);
